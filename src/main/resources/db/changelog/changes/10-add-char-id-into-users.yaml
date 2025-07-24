@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-chat-id-into-users
+      author: slava
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: chat_id
+                  type: bigint
+                  constraints:
+                    nullable: true
