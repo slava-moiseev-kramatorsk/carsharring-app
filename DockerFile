@@ -1,0 +1,16 @@
+# Builder stage
+FROM openjdk:17-jdk-slim AS builder
+WORKDIR demo
+ARG JAVA_FILE=target/*.jar
+COPY ${JAVA_FILE} carsharring.jar
+RUN java -Djarmode=layertools -jar carsharring.jar extract
+
+  # Final stage
+FROM openjdk:17-jdk-slim
+WORKDIR carsharring
+COPY --from=builder demo/dependencies/ ./
+COPY --from=builder demo/spring-boot-loader/ ./
+COPY --from=builder demo/snapshot-dependencies/ ./
+COPY --from=builder demo/application/ ./
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+EXPOSE 8080
