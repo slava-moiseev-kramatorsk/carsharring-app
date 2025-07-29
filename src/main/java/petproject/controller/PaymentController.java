@@ -38,7 +38,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('CUSTOMER')or hasRole('MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new payment",
             description = "Endpoint for create a new payment")
@@ -47,7 +47,7 @@ public class PaymentController {
     }
 
     @PostMapping("/success")
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('CUSTOMER')or hasRole('MANAGER')")
     @Operation(summary = "Updates payment status",
             description = "Updates payment status to 'PAID' "
                     + "and sends a notification to telegram chat")
@@ -58,7 +58,7 @@ public class PaymentController {
     }
 
     @PostMapping("/cancel")
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "Cancel endpoint",
             description = "Endpoint for redirection in case of "
                     + "payment cancellation")

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import petproject.dto.rental.CreateRentalDto;
 import petproject.dto.rental.RentalDto;
-//import petproject.dto.rental.RentalSearchByUserIdAndIsActive;
 import petproject.model.User;
 import petproject.security.CustomUserDetailService;
 import petproject.service.rental.RentalService;

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import petproject.dto.user.CreateUserDto;
@@ -18,7 +17,6 @@ import petproject.service.user.UserService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
 @Tag(name = "Users management", description = "Endpoints for users management")
 public class AuthenticationController {
     private final UserService userService;

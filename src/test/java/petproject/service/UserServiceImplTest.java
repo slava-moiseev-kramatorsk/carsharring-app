@@ -1,6 +1,7 @@
 package petproject.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import petproject.dto.user.CreateUserDto;
 import petproject.dto.user.UserDto;
+import petproject.exeption.EntityNotFoundException;
 import petproject.mapper.UserMapper;
 import petproject.model.Role;
 import petproject.model.User;
@@ -64,6 +66,22 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get user by invalid email, exception expected")
+    public void getUserByInvalidEmail_shouldThrowException() {
+        CreateUserDto createUserDto = ServiceTestUtil.createUserToRegister();
+        when(userRepository.findByEmail(createUserDto.getEmail())).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.findByEmail(createUserDto.getEmail())
+        );
+        String expected = "Can`t find user by  this email " + createUserDto.getEmail();
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     @DisplayName("Update user role")
     public void updateUserRole_ok() {
         User userBeforeUpdateRole = ServiceTestUtil.createUserForRegisterTest();
@@ -85,6 +103,16 @@ class UserServiceImplTest {
         verify(roleRepository, times(1)).findByRole(Role.RoleName.ROLE_MANAGER);
         verify(userRepository, times(1)).save(userBeforeUpdateRole);
         verify(userMapper, times(1)).toDto(userAfterUpdateRole);
+    }
+
+    @Test
+    @DisplayName("Update user role with invalid role exception expected")
+    public void updateRole_invalidData_shouldThrowException() {
+        Long id = 1L;
+        String invalidRole = "ROLE_CLIENT";
+
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUserRole(id, invalidRole));
     }
 
     @Test

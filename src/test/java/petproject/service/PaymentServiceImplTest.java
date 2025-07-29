@@ -1,6 +1,7 @@
 package petproject.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -21,6 +22,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import petproject.dto.payment.CreatePaymentDto;
 import petproject.dto.payment.PaymentDto;
+import petproject.exeption.EntityNotFoundException;
 import petproject.mapper.PaymentMapper;
 import petproject.model.Payment;
 import petproject.model.Rental;
@@ -44,7 +46,7 @@ class PaymentServiceImplTest {
     private PaymentServiceImpl paymentService;
 
     @Test
-    @DisplayName("Create new payment")
+    @DisplayName("Get payment by valid id")
     public void getPaymentByID_validData_ok() {
         Payment payment = ServiceTestUtil.createTestPayment();
         PaymentDto expected = ServiceTestUtil.createPaymentDto();
@@ -53,6 +55,21 @@ class PaymentServiceImplTest {
         when(paymentMapper.toPaymentDto(payment)).thenReturn(expected);
 
         PaymentDto actual = paymentService.getById(12L);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Get payment by invalid id")
+    public void getPayment_WithInvalidId_shouldThrowException() {
+        Long id = 100L;
+        when(paymentRepository.findById(id)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> paymentService.getById(id)
+        );
+        String expected = "Can`t find payment bi this id " + id;
+        String actual = exception.getMessage();
         assertEquals(expected, actual);
     }
 
@@ -76,6 +93,25 @@ class PaymentServiceImplTest {
         verify(notificationsService, times(1))
                 .sendMessageOfSuccessfulPayment(user);
         assertEquals(Payment.Status.PAID, payment.getStatus());
+    }
+
+    @Test
+    @DisplayName("Update payment status by invalid session_id")
+    public void updatePaymentStatus_invalidSessionId_shouldThrowException() {
+        String sessionId = "000000";
+        User user = ServiceTestUtil.createTestUser();
+
+        when(paymentRepository.findBySessionId(sessionId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> paymentService.updatePaymentStatus(sessionId,user)
+        );
+
+        String expected = "Can`t find Payment by this sessionId " + sessionId;
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
     }
 
     @Test

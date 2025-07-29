@@ -1,6 +1,7 @@
 package petproject.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import petproject.dto.rental.CreateRentalDto;
 import petproject.dto.rental.RentalDto;
+import petproject.exeption.EntityNotFoundException;
 import petproject.mapper.RentalMapper;
 import petproject.model.Car;
 import petproject.model.Rental;
@@ -62,6 +64,25 @@ class RentalServiceImplTest {
     }
 
     @Test
+    @DisplayName("Get rental by user if and rental id with invalid data")
+    public void getRental_invalidId_shouldThrowException() {
+        User testUser = ServiceTestUtil.createTestUser();
+        Long rentalId = 1L;
+
+        when(rentalRepository.findByIdAndUserId(testUser.getId(), rentalId))
+                .thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> rentalService.getRentalByUserId(testUser, rentalId)
+        );
+        String expected = "Can`t find rental by this id " + rentalId;
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     @DisplayName("Find rental by id")
     public void findRentalById_validData_ok() {
         Long id = 5L;
@@ -103,5 +124,25 @@ class RentalServiceImplTest {
         verify(rentalRepository, times(1)).findById(rental.getUser().getId());
         verify(rentalRepository,times(1)).save(rental);
         verify(rentalMapper, times(1)).toDto(rental);
+    }
+
+    @Test
+    @DisplayName("Set actual return date when actual return date already exist")
+    public void setActualReturnDate_whenExist_shouldThrowException() {
+        Rental rental = ServiceTestUtil.createTestRental();
+        rental.setActualReturnDate(LocalDate.now());
+        User user = new User();
+        user.setId(1L);
+        rental.setUser(user);
+        when(rentalRepository.findById(rental.getId())).thenReturn(Optional.of(rental));
+
+        Exception exception = assertThrows(
+                RuntimeException.class,
+                () -> rentalService.setActualReturnDate(rental.getUser())
+        );
+        String expected = "You are already return car ";
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
     }
 }

@@ -101,9 +101,7 @@ public class RentalServiceImpl implements RentalService {
             return false;
         }
         LocalDate actualDate = LocalDate.now();
-        return (actualDate.isEqual(rental.getRentalDate())
-                || actualDate.isAfter(rental.getRentalDate()))
-                && (actualDate.equals(rental.getReturnDate())
-                || actualDate.isBefore(rental.getReturnDate()));
+        return !actualDate.isBefore(rental.getRentalDate())
+                && !actualDate.isAfter(rental.getReturnDate());
     }
 }

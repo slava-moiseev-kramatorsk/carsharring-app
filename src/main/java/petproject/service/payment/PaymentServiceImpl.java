@@ -25,8 +25,8 @@ import petproject.repository.rental.RentalRepository;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private static final String STRIPE_SECRET_KEY = Dotenv.load().get("STRIPE_SECRET_KEY");
-    private static final String SUCCESS_URL = "http://localhost:8080/payments/success?session_id={CHECKOUT_SESSION_ID}";
-    private static final String CANCEL_URL = "http://localhost:8080/payments/cancel?session_id={CHECKOUT_SESSION_ID}";
+    private static final String SUCCESS_URL = Dotenv.load().get("PAYMENT_SUCCESS_URL");
+    private static final String CANCEL_URL = Dotenv.load().get("PAYMENT_CANCEL_URL");
 
     static {
         Stripe.apiKey = STRIPE_SECRET_KEY;
