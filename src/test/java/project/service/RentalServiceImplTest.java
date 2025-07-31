@@ -1,0 +1,150 @@
+package project.service;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import project.dto.rental.CreateRentalDto;
+import project.dto.rental.RentalDto;
+import project.exeption.EntityNotFoundException;
+import project.mapper.RentalMapper;
+import project.model.Car;
+import project.model.Rental;
+import project.model.User;
+import project.notification.TelegramNotificationsService;
+import project.repository.car.CarRepository;
+import project.repository.rental.RentalRepository;
+import project.service.rental.RentalServiceImpl;
+
+@ExtendWith(MockitoExtension.class)
+class RentalServiceImplTest {
+    @Mock
+    private RentalRepository rentalRepository;
+    @Mock
+    private RentalMapper rentalMapper;
+    @Mock
+    private CarRepository carRepository;
+    @Mock
+    private TelegramNotificationsService telegramNotificationsService;
+    @InjectMocks
+    private RentalServiceImpl rentalService;
+
+    @Test
+    @DisplayName("Create new rental")
+    public void createNewRental_validData_ok() {
+        Rental rental = ServiceTestUtil.createTestRental();
+        RentalDto expected = ServiceTestUtil.createRentalDto();
+        Car car = ServiceTestUtil.createOneCar();
+        User user = ServiceTestUtil.createTestUser();
+        CreateRentalDto createRentalDto = new CreateRentalDto()
+                .setRentalDate(rental.getRentalDate())
+                .setReturnDate(rental.getReturnDate())
+                .setCarId(rental.getCar().getId());
+
+        when(rentalRepository.save(rental)).thenReturn(rental);
+        when(rentalMapper.toModel(createRentalDto)).thenReturn(rental);
+        when(rentalMapper.toDto(rental)).thenReturn(expected);
+        when(carRepository.findById(rental.getCar().getId())).thenReturn(Optional.of(car));
+
+        RentalDto actual = rentalService.createRental(user, createRentalDto);
+
+        verify(telegramNotificationsService)
+                .sendMessageOfCreateNewRental(user, rental);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Get rental by user if and rental id with invalid data")
+    public void getRental_invalidId_shouldThrowException() {
+        User testUser = ServiceTestUtil.createTestUser();
+        Long rentalId = 1L;
+
+        when(rentalRepository.findByIdAndUserId(testUser.getId(), rentalId))
+                .thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> rentalService.getRentalByUserId(testUser, rentalId)
+        );
+        String expected = "Can`t find rental by this id " + rentalId;
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
+
+        verify(rentalRepository).findByIdAndUserId(testUser.getId(), rentalId);
+    }
+
+    @Test
+    @DisplayName("Find rental by id")
+    public void findRentalById_validData_ok() {
+        Long id = 5L;
+        Rental rental = ServiceTestUtil.createTestRental();
+        RentalDto expected = ServiceTestUtil.createRentalDto();
+
+        when(rentalRepository.findByIdAndUserId(id, rental.getUser().getId()))
+                .thenReturn(Optional.of(rental));
+        when(rentalMapper.toDto(rental)).thenReturn(expected);
+
+        RentalDto actual = rentalService.getRentalByUserId(rental.getUser(), id);
+
+        verify(rentalRepository).findByIdAndUserId(rental.getUser().getId(), id);
+        verify(rentalMapper).toDto(rental);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Set actual returnDate - close rental")
+    public void setActualReturnDate_ok() {
+        Rental rental = ServiceTestUtil.createTestRental();
+        rental.setActive(true);
+        rental.setActualReturnDate(null);
+        RentalDto expected = ServiceTestUtil.createRentalDto()
+                .setReturnDate(LocalDate.now().minusDays(3))
+                .setRentalDate(LocalDate.now().minusDays(5))
+                .setActualReturnDate(LocalDate.now());
+
+        when(rentalRepository.findById(rental.getUser().getId())).thenReturn(Optional.of(rental));
+        when(rentalRepository.save(rental)).thenReturn(rental);
+        when(rentalMapper.toDto(rental)).thenReturn(expected);
+
+        RentalDto actual = rentalService.setActualReturnDate(rental.getUser());
+
+        assertEquals(expected, actual);
+
+        verify(rentalRepository).findById(rental.getUser().getId());
+        verify(rentalRepository).save(rental);
+        verify(rentalMapper).toDto(rental);
+    }
+
+    @Test
+    @DisplayName("Set actual return date when actual return date already exist")
+    public void setActualReturnDate_whenExist_shouldThrowException() {
+        Rental rental = ServiceTestUtil.createTestRental();
+        rental.setActualReturnDate(LocalDate.now());
+        User user = new User();
+        user.setId(1L);
+        rental.setUser(user);
+        when(rentalRepository.findById(rental.getId())).thenReturn(Optional.of(rental));
+
+        Exception exception = assertThrows(
+                RuntimeException.class,
+                () -> rentalService.setActualReturnDate(rental.getUser())
+        );
+        String expected = "You are already return car ";
+        String actual = exception.getMessage();
+
+        assertEquals(expected, actual);
+
+        verify(rentalRepository).findById(rental.getId());
+    }
+}

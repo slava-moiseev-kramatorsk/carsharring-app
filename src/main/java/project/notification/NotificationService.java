@@ -1,0 +1,18 @@
+package project.notification;
+
+import java.util.List;
+import project.model.Car;
+import project.model.Rental;
+import project.model.User;
+
+public interface NotificationService {
+    void sendMessageOfCreateNewCar(User user, Car car);
+
+    void sendMessageOfSuccessfulPayment(User user);
+
+    void sendMessageOfCreateNewRental(User user, Rental rental);
+
+    void sendMessageOfOverdueRentals(List<Rental> rentalList);
+
+    void sendMessageOfCanceledPayment(Rental rental, User user);
+}

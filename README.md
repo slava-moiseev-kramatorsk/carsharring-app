@@ -81,7 +81,7 @@ Before you begin, make sure you have installed:
 
 1. Clone this API
 ```
-   https://github.com/slava-moiseev-kramatorsk/carsharring-app
+   git clone https://github.com/slava-moiseev-kramatorsk/carsharring-app.git
    cd your_repo_name
    ```
 2. Set up the database
@@ -118,3 +118,7 @@ docker-compose down
 
 For API description and usage, open the link in your browser
 ```http://localhost:8088/swagger-ui/```
+
+7. API Testing
+
+Import the provided [Postman Collection](https://.postman.co/workspace/My-Workspace~0750f7c0-aec3-4052-85bf-d5e8b8680438/collection/36728804-5bd833e3-86cb-4932-a853-aaedf9a0fded?action=share&creator=36728804) to test API endpoints.
