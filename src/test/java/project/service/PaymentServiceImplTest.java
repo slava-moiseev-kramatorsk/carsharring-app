@@ -30,6 +30,7 @@ import project.notification.TelegramNotificationsService;
 import project.repository.payment.PaymentRepository;
 import project.repository.rental.RentalRepository;
 import project.service.payment.PaymentServiceImpl;
+import project.service.util.ServiceTestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {

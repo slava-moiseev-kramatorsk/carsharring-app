@@ -23,6 +23,7 @@ import project.model.User;
 import project.repository.role.RoleRepository;
 import project.repository.user.UserRepository;
 import project.service.user.UserServiceImpl;
+import project.service.util.ServiceTestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {

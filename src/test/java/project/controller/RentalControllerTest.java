@@ -11,6 +11,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
@@ -37,7 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
+import project.controller.util.ControllerTestUtil;
 import project.dto.rental.RentalDto;
 import project.model.User;
 import project.repository.user.UserRepository;
@@ -176,7 +177,7 @@ class RentalControllerTest {
         RentalDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), RentalDto.class);
 
-        assertTrue(EqualsBuilder.reflectionEquals(expected, actual, "id"));
+        assertTrue(reflectionEquals(expected, actual, "id"));
         verify(rentalService).setActualReturnDate(testUser);
     }
 }

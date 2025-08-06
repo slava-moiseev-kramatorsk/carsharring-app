@@ -27,6 +27,7 @@ import project.model.User;
 import project.notification.TelegramNotificationsService;
 import project.repository.car.CarRepository;
 import project.service.car.CarServiceImpl;
+import project.service.util.ServiceTestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class CarServiceImplTest {
@@ -70,9 +71,9 @@ class CarServiceImplTest {
             when(carMapper.toDto(carsList.get(i))).thenReturn(carsDtoList.get(i));
         }
 
-        List<CarDto> actual = carService.findAll(pageable);
+        Page<CarDto> actual = carService.findAll(pageable);
         verify(carRepository).findAll(pageable);
-        assertEquals(carsDtoList, actual);
+        assertEquals(carsDtoList, actual.getContent());
     }
 
     @Test

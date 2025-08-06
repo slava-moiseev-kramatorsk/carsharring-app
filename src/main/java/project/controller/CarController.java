@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +48,7 @@ public class CarController {
     @PreAuthorize("hasRole('MANAGER')or hasRole('CUSTOMER')")
     @Operation(summary = "Get all cars",
             description = "Get all cars from DB")
-    public List<CarDto> getAll(Pageable pageable) {
+    public Page<CarDto> getAll(Pageable pageable) {
         return carService.findAll(pageable);
     }
 

@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import project.controller.util.ControllerTestUtil;
 import project.dto.user.CreateUserDto;
 import project.dto.user.UserDto;
 import project.mapper.UserMapper;

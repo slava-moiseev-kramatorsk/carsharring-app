@@ -12,9 +12,11 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/06-create-cars-table.yaml
   - include:
+      file: db/changelog/changes/08-create-rentals-table.yaml
+  - include:
       file: db/changelog/changes/07-create-payments-table.yaml
   - include:
-      file: db/changelog/changes/08-create-rentals-table.yaml
+      file: db/changelog/changes/11-add-fk-to-payments.yaml
   - include:
       file: db/changelog/changes/09-add-isActive-column-into-rentals-table.yaml
   - include:

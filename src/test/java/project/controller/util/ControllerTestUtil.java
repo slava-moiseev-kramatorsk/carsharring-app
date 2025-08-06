@@ -1,4 +1,4 @@
-package project.controller;
+package project.controller.util;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import project.model.User;
 
 public class ControllerTestUtil {
 
-    static CreateCarDto createOneCarToRequest() {
+    public static CreateCarDto createOneCarToRequest() {
         return new CreateCarDto()
                 .setBrand("Toyota")
                 .setModel("Camry")
@@ -25,7 +25,7 @@ public class ControllerTestUtil {
                 .setDaileFee(BigDecimal.valueOf(90));
     }
 
-    static CarDto createCarDto() {
+    public static CarDto createCarDto() {
         return new CarDto()
                 .setBrand(createOneCarToRequest().getBrand())
                 .setModel(createOneCarToRequest().getModel())
@@ -34,7 +34,7 @@ public class ControllerTestUtil {
                 .setDaileFee(createOneCarToRequest().getDaileFee());
     }
 
-    static User createUserForTests() {
+    public static User createUserForTests() {
         User user = new User();
         user.setId(5L);
         user.setFirstName("Slava");
@@ -45,7 +45,7 @@ public class ControllerTestUtil {
         return user;
     }
 
-    static List<CarDto> carDtoListSizeThree() {
+    public static List<CarDto> carDtoListSizeThree() {
         List<CarDto> carDtoList = new ArrayList<>();
         carDtoList.add(new CarDto()
                 .setBrand("Brand")
@@ -67,7 +67,7 @@ public class ControllerTestUtil {
         return carDtoList;
     }
 
-    static List<CarDto> carDtoListSizeTwo() {
+    public static List<CarDto> carDtoListSizeTwo() {
         List<CarDto> carDtoList = new ArrayList<>();
         carDtoList.add(new CarDto().setBrand("Fiat")
                 .setModel("Typo")
@@ -83,7 +83,7 @@ public class ControllerTestUtil {
         return carDtoList;
     }
 
-    static PaymentDto createTestPayment() {
+    public static PaymentDto createTestPayment() {
         return new PaymentDto()
                 .setStatus(String.valueOf(Payment.Status.PENDING))
                 .setType(String.valueOf(Payment.Type.PAYMENT))
@@ -92,7 +92,7 @@ public class ControllerTestUtil {
                 .setAmount(BigDecimal.valueOf(157));
     }
 
-    static PaymentDto createForUpdateStatusOrCanceling() {
+    public static PaymentDto createForUpdateStatusOrCanceling() {
         return new PaymentDto()
                 .setStatus(String.valueOf(Payment.Status.PAID))
                 .setType(String.valueOf(Payment.Type.FINE))
@@ -101,7 +101,7 @@ public class ControllerTestUtil {
                 .setAmount(BigDecimal.valueOf(120));
     }
 
-    static Car createOneCarForTest() {
+    public static Car createOneCarForTest() {
         Car car = new Car();
         car.setBrand("Fiat");
         car.setModel("Typo");
@@ -111,7 +111,7 @@ public class ControllerTestUtil {
         return car;
     }
 
-    static Rental createRentalForTest() {
+    public static Rental createRentalForTest() {
         Rental rental = new Rental();
         rental.setUser(createUserForTests());
         rental.setRentalDate(LocalDate.parse("2025-01-13"));
@@ -120,7 +120,7 @@ public class ControllerTestUtil {
         return rental;
     }
 
-    static Payment createOnePayment() {
+    public static Payment createOnePayment() {
         Payment payment = new Payment();
         payment.setStatus(Payment.Status.PENDING);
         payment.setType(Payment.Type.PAYMENT);
@@ -131,14 +131,14 @@ public class ControllerTestUtil {
         return payment;
     }
 
-    static UserDto createUserDtoForTest() {
+    public static UserDto createUserDtoForTest() {
         return new UserDto()
                 .setEmail("Admin@gmail.com")
                 .setFirstName("Slava")
                 .setLastName("Moiseeev");
     }
 
-    static CreateUserDto userDtoForUpdate() {
+    public static CreateUserDto userDtoForUpdate() {
         return new CreateUserDto()
                 .setEmail("updatedEmail")
                 .setFirstName("updatedFirstName")

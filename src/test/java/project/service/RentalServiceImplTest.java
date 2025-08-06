@@ -24,6 +24,7 @@ import project.notification.TelegramNotificationsService;
 import project.repository.car.CarRepository;
 import project.repository.rental.RentalRepository;
 import project.service.rental.RentalServiceImpl;
+import project.service.util.ServiceTestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class RentalServiceImplTest {
@@ -59,6 +60,29 @@ class RentalServiceImplTest {
 
         verify(telegramNotificationsService)
                 .sendMessageOfCreateNewRental(user, rental);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Create rental with invalid data")
+    public void createRental_invalidData_shouldThrowException() {
+        Car car = new Car();
+        car.setId(1L);
+        car.setInventory(1);
+        User user = ServiceTestUtil.createTestUser();
+
+        when(carRepository.findById(car.getId())).thenReturn(Optional.of(car));
+        CreateRentalDto invalidRental = new CreateRentalDto()
+                .setReturnDate((LocalDate.now().minusDays(1)))
+                .setCarId(1L);
+        Exception exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> rentalService.createRental(user, invalidRental)
+        );
+
+        String expected = "Return date can't be before today";
+        String actual = exception.getMessage();
+
         assertEquals(expected, actual);
     }
 

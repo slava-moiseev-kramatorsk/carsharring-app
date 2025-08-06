@@ -1,4 +1,4 @@
-package project.service;
+package project.service.util;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ import project.model.User;
 
 public class ServiceTestUtil {
 
-    static User createTestUser() {
+    public static User createTestUser() {
         User user = new User();
         user.setId(5L);
         user.setFirstName("Slava");
@@ -30,7 +30,7 @@ public class ServiceTestUtil {
         return user;
     }
 
-    static CreateCarDto createCarDto() {
+    public static CreateCarDto createCarDto() {
         return new CreateCarDto()
                 .setBrand("Skoda")
                 .setModel("Fabia")
@@ -39,7 +39,7 @@ public class ServiceTestUtil {
                 .setDaileFee(BigDecimal.valueOf(77));
     }
 
-    static Car createOneCar() {
+    public static Car createOneCar() {
         Car car = new Car();
         car.setId(15L);
         car.setBrand("Skoda");
@@ -50,7 +50,7 @@ public class ServiceTestUtil {
         return car;
     }
 
-    static CarDto createOneCarDto() {
+    public static CarDto createOneCarDto() {
         return new CarDto()
                 .setBrand("Skoda")
                 .setModel("Fabia")
@@ -59,7 +59,7 @@ public class ServiceTestUtil {
                 .setDaileFee(BigDecimal.valueOf(77));
     }
 
-    static List<Car> generateThreeCars() {
+    public static List<Car> generateThreeCars() {
         Car firstCar = new Car();
         firstCar.setBrand("Skoda");
         firstCar.setModel("Octavia");
@@ -88,7 +88,7 @@ public class ServiceTestUtil {
         return list;
     }
 
-    static List<CarDto> generateThreeCarDto() {
+    public static List<CarDto> generateThreeCarDto() {
         CarDto firstCar = new CarDto();
         firstCar.setBrand("Skoda");
         firstCar.setModel("Octavia");
@@ -117,7 +117,7 @@ public class ServiceTestUtil {
         return list;
     }
 
-    static Payment createTestPayment() {
+    public static Payment createTestPayment() {
         Payment payment = new Payment();
         payment.setId(12L);
         payment.setStatus(Payment.Status.PENDING);
@@ -129,7 +129,7 @@ public class ServiceTestUtil {
         return payment;
     }
 
-    static Rental createTestRental() {
+    public static Rental createTestRental() {
         Rental rental = new Rental();
         rental.setId(1L);
         rental.setUser(createTestUser());
@@ -140,7 +140,7 @@ public class ServiceTestUtil {
         return rental;
     }
 
-    static PaymentDto createPaymentDto() {
+    public static PaymentDto createPaymentDto() {
         return new PaymentDto()
                 .setStatus(String.valueOf(Payment.Status.PENDING))
                 .setType(String.valueOf(Payment.Type.PAYMENT))
@@ -149,7 +149,7 @@ public class ServiceTestUtil {
                 .setAmount(BigDecimal.valueOf(66));
     }
 
-    static RentalDto createRentalDto() {
+    public static RentalDto createRentalDto() {
         return new RentalDto()
                 .setCarId(createOneCar().getId())
                 .setUserId(createTestUser().getId())
@@ -157,7 +157,7 @@ public class ServiceTestUtil {
                 .setReturnDate(LocalDate.now().plusDays(4));
     }
 
-    static CreateUserDto createUserToRegister() {
+    public static CreateUserDto createUserToRegister() {
         return new CreateUserDto()
                 .setEmail("Test@gmail.com")
                 .setFirstName("TestName")
@@ -165,14 +165,14 @@ public class ServiceTestUtil {
                 .setPassword("qwerty123");
     }
 
-    static UserDto createUserDtoResponse() {
+    public static UserDto createUserDtoResponse() {
         return new UserDto()
                 .setEmail("Test@gmail.com")
                 .setFirstName("TestName")
                 .setLastName("TestLastName");
     }
 
-    static User createUserForRegisterTest() {
+    public static User createUserForRegisterTest() {
         User user = new User();
         user.setEmail("Test@gmail.com");
         user.setFirstName("TestName");
@@ -184,7 +184,7 @@ public class ServiceTestUtil {
         return user;
     }
 
-    static CreateUserDto createUserDtoForUpdate() {
+    public static CreateUserDto createUserDtoForUpdate() {
         return new CreateUserDto()
                 .setEmail("second@gmailcom")
                 .setFirstName("updatedName")

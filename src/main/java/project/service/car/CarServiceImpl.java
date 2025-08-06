@@ -2,6 +2,7 @@ package project.service.car;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,8 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<CarDto> findAll(Pageable pageable) {
-        return carRepository.findAll(pageable).stream().map(carMapper::toDto).toList();
+    public Page<CarDto> findAll(Pageable pageable) {
+        return carRepository.findAll(pageable).map(carMapper::toDto);
     }
 
     @Override

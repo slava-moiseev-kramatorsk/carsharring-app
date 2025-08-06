@@ -3,6 +3,7 @@ package project.controller;
 import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -13,11 +14,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
@@ -38,6 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import project.controller.util.ControllerTestUtil;
 import project.dto.car.CarDto;
 import project.dto.car.CreateCarDto;
 import project.model.Car;
@@ -94,7 +97,7 @@ class CarControllerTest {
     @Sql(scripts = DELETE_FROM_CARS,
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Create a new car")
-    void createBook_validData_Success() throws Exception {
+    void createCar_validData_Success() throws Exception {
         CreateCarDto carToRequest = ControllerTestUtil.createOneCarToRequest();
         CarDto expected = ControllerTestUtil.createCarDto();
 
@@ -117,7 +120,23 @@ class CarControllerTest {
 
         CarDto actual = objectMapper.readValue(
                 result.getResponse().getContentAsString(), CarDto.class);
-        reflectionEquals(expected, actual, "id");
+        assertTrue(reflectionEquals(expected, actual, "id"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"MANAGER"})
+    @DisplayName("Add car with empty data")
+    public void caveCar_invalidData_expectedStatusBadRequest() throws Exception {
+        CreateCarDto invalidCarDto = new CreateCarDto()
+                .setBrand("")
+                .setModel("")
+                .setInventory(-1)
+                .setType("")
+                .setDaileFee(BigDecimal.valueOf(-0.66));
+        mockMvc.perform(post("/cars")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCarDto)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -136,10 +155,13 @@ class CarControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn();
-        List<CarDto> actualList = Arrays.stream(
-                objectMapper.readValue(result.getResponse()
-                        .getContentAsByteArray(), CarDto[].class))
-                .toList();
+        JsonNode rootNode = objectMapper.readTree(result.getResponse().getContentAsByteArray());
+
+        List<CarDto> actualList = objectMapper.convertValue(
+                rootNode.get("content"),
+                new TypeReference<>() {
+                }
+        );
         assertEquals(expectedList.size(), actualList.size());
         assertThat(actualList)
                 .usingRecursiveComparison()
@@ -191,11 +213,14 @@ class CarControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn();
-        List<CarDto> actual = Arrays.stream(
-                objectMapper.readValue(result.getResponse()
-                        .getContentAsString(), CarDto[].class))
-                .toList();
+
+        JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
+        List<CarDto> actual = objectMapper.convertValue(
+                root.get("content"),
+                new TypeReference<List<CarDto>>() {}
+        );
+
         assertEquals(expected.size(), actual.size());
-        reflectionEquals(expected,actual);
+        assertEquals(expected,actual);
     }
 }
