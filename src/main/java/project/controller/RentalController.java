@@ -25,7 +25,7 @@ import project.service.rental.RentalService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/rentals")
+@RequestMapping("/rentals")
 @Tag(name = "Rental management",
         description = "Handles all operations related to car rentals")
 public class RentalController {
