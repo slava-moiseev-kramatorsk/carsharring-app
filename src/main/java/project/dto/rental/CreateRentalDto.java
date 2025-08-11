@@ -2,6 +2,7 @@ package project.dto.rental;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,5 +16,6 @@ public class CreateRentalDto {
     @NotNull
     private LocalDate returnDate;
     @NotNull
+    @Positive
     private Long carId;
 }

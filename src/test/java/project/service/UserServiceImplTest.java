@@ -42,8 +42,9 @@ class UserServiceImplTest {
     @DisplayName("Create new user")
     public void saveNewUser_validData_ok() {
         CreateUserDto createUserDto = ServiceTestUtil.createUserToRegister();
+        Role role = new Role();
+        role.setRole(Role.RoleName.ROLE_CUSTOMER);
         UserDto expected = ServiceTestUtil.createUserDtoResponse();
-        Role role = new Role(Role.RoleName.ROLE_CUSTOMER);
         User user = ServiceTestUtil.createUserForRegisterTest();
 
         when(userRepository.existsByEmail(createUserDto.getEmail())).thenReturn(false);
@@ -85,11 +86,12 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Update user role")
     public void updateUserRole_ok() {
-        User userBeforeUpdateRole = ServiceTestUtil.createUserForRegisterTest();
         User userAfterUpdateRole = ServiceTestUtil.createUserForRegisterTest();
-        Role roleManager = new Role(Role.RoleName.ROLE_MANAGER);
+        Role roleManager = new Role();
+        roleManager.setRole(Role.RoleName.ROLE_MANAGER);
         userAfterUpdateRole.setRoles(Set.of(roleManager));
         UserDto userDto = ServiceTestUtil.createUserDtoResponse();
+        User userBeforeUpdateRole = ServiceTestUtil.createUserForRegisterTest();
 
         when(roleRepository.findByRole(Role.RoleName.ROLE_MANAGER))
                 .thenReturn(Optional.of(roleManager));

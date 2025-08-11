@@ -128,7 +128,7 @@ class UserControllerTest {
         when(userMapper.toDto(any(User.class)))
                 .thenReturn(updatedUsersData);
 
-        String jsonBody = objectMapper.writeValueAsString(updatedUsersData);
+        String jsonBody = objectMapper.writeValueAsString(dtoForUpdate);
 
         mockMvc.perform(put("/users/me")
                         .contentType(MediaType.APPLICATION_JSON)

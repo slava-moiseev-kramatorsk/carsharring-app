@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.rental.CreateRentalDto;
 import project.dto.rental.RentalDto;
 import project.exeption.EntityNotFoundException;
@@ -17,6 +18,7 @@ import project.repository.car.CarRepository;
 import project.repository.rental.RentalRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
@@ -44,6 +46,7 @@ public class RentalServiceImpl implements RentalService {
         return rentalMapper.toDto(rentalRepository.save(rental));
     }
 
+    @Override
     public RentalDto getRentalByUserId(User user, Long id) {
         Rental rental = rentalRepository.findByIdAndUserId(user.getId(), id)
                 .orElseThrow(
@@ -52,6 +55,7 @@ public class RentalServiceImpl implements RentalService {
         return rentalMapper.toDto(rental);
     }
 
+    @Override
     public RentalDto setActualReturnDate(User user) {
         Rental rental = rentalRepository.findById(user.getId()).orElseThrow(
                 () -> new EntityNotFoundException("rental by this id "
@@ -68,6 +72,7 @@ public class RentalServiceImpl implements RentalService {
         return rentalMapper.toDto(updatedRental);
     }
 
+    @Override
     public List<RentalDto> getByUserIdAndIsActive(Long userId, boolean isActive) {
         List<Rental> rentals = rentalRepository.findByUserId(userId);
         rentals = rentals.stream()

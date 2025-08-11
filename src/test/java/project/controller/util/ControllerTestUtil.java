@@ -140,9 +140,9 @@ public class ControllerTestUtil {
 
     public static CreateUserDto userDtoForUpdate() {
         return new CreateUserDto()
-                .setEmail("updatedEmail")
-                .setFirstName("updatedFirstName")
-                .setLastName("updatedLastName")
-                .setPassword("updatedPassword123");
+                .setEmail("updated@email.com")
+                .setFirstName("UpdatedFirstName")
+                .setLastName("UpdatedLastName")
+                .setPassword("UpdatedPass123");
     }
 }

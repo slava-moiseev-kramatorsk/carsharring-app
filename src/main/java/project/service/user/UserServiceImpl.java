@@ -1,12 +1,13 @@
 package project.service.user;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.user.CreateUserDto;
 import project.dto.user.UserDto;
+import project.exeption.EntityNotFoundException;
 import project.exeption.RegistrationException;
 import project.mapper.UserMapper;
 import project.model.Role;
@@ -15,6 +16,7 @@ import project.repository.role.RoleRepository;
 import project.repository.user.UserRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new project.exeption.EntityNotFoundException(
+                () -> new EntityNotFoundException(
                         "Can`t find user by  this email " + email
                 )
         );
@@ -53,11 +55,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUserRole(Long id, String role) {
         Role updatedRole = roleRepository.findByRole(Role.RoleName.valueOf(role)).orElseThrow(
-                () -> new project.exeption.EntityNotFoundException("Can`t find this role "
+                () -> new EntityNotFoundException("Can`t find this role "
                         + role)
         );
         User user = userRepository.findById(id).orElseThrow(
-                () -> new project.exeption.EntityNotFoundException(
+                () -> new EntityNotFoundException(
                         "Can`t find user by this id " + id
                 )
         );
@@ -67,10 +69,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateYourProfile(User user, CreateUserDto createUserDto) {
-        user.setEmail(createUserDto.getEmail());
-        user.setFirstName(createUserDto.getFirstName());
-        user.setLastName(createUserDto.getLastName());
-        user.setPassword(createUserDto.getPassword());
+        userMapper.updateUserFromDto(createUserDto, user);
         return userMapper.toDto(userRepository.save(user));
     }
 }

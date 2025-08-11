@@ -178,7 +178,8 @@ public class ServiceTestUtil {
         user.setFirstName("TestName");
         user.setLastName("TestLastName");
         user.setPassword("qwerty123");
-        Role role = new Role(Role.RoleName.ROLE_CUSTOMER);
+        Role role = new Role();
+        role.setRole(Role.RoleName.ROLE_CUSTOMER);
         user.setRoles(Set.of(role));
         user.setDeleted(false);
         return user;

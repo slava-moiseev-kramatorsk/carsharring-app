@@ -7,9 +7,9 @@ import com.stripe.param.checkout.SessionCreateParams;
 import io.github.cdimascio.dotenv.Dotenv;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.payment.CreatePaymentDto;
 import project.dto.payment.PaymentDto;
 import project.exeption.EntityNotFoundException;
@@ -22,6 +22,7 @@ import project.repository.payment.PaymentRepository;
 import project.repository.rental.RentalRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private static final String STRIPE_SECRET_KEY = Dotenv.load().get("STRIPE_SECRET_KEY");
@@ -69,15 +70,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDto updatePaymentStatus(String sessionId, User user) {
-        Optional<Payment> paymentOptional = paymentRepository.findBySessionId(sessionId);
-        if (paymentOptional.isPresent()) {
-            Payment payment = paymentOptional.get();
-            payment.setStatus(Payment.Status.PAID);
-            telegramNotificationsService.sendMessageOfSuccessfulPayment(user);
-            return paymentMapper.toPaymentDto(paymentRepository.save(payment));
-        } else {
-            throw new EntityNotFoundException("Can`t find Payment by this sessionId " + sessionId);
-        }
+        Payment payment = paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Can`t find Payment by this sessionId "
+                                + sessionId));
+        payment.setStatus(Payment.Status.PAID);
+        telegramNotificationsService.sendMessageOfSuccessfulPayment(user);
+        return paymentMapper.toPaymentDto(paymentRepository.save(payment));
     }
 
     @Override

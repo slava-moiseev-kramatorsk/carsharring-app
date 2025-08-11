@@ -14,17 +14,17 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: rental_Date
+                  name: rental_date
                   type: DATE
                   constraints:
                     nullable: false
               - column:
-                  name: return_Date
+                  name: return_date
                   type: DATE
                   constraints:
                     nullable: false
               - column:
-                  name: actual_Return_Date
+                  name: actual_return_date
                   type: DATE
               - column:
                   name: car_id

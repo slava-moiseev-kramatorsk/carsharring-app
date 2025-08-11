@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.car.CarDto;
 import project.dto.car.CarSearchParams;
 import project.dto.car.CreateCarDto;
@@ -19,6 +20,7 @@ import project.repository.car.CarSpecificationBuilder;
 import project.security.CustomUserDetailService;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
@@ -39,7 +41,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Page<CarDto> findAll(Pageable pageable) {
-        return carRepository.findAll(pageable).map(carMapper::toDto);
+        return carRepository.findAll(pageable)
+                .map(carMapper::toDto);
     }
 
     @Override
