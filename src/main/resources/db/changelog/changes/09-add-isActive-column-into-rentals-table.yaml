@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-isActive-column
+      author: slava
+      changes:
+        - addColumn:
+            tableName: rentals
+            columns:
+              - column:
+                  name: is_active
+                  type: bit
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
