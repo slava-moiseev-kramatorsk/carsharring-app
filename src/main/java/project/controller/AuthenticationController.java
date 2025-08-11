@@ -2,6 +2,7 @@ package project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class AuthenticationController {
     @PostMapping("/registration")
     @Operation(summary = "Add new user", description = "Add new user to DB")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto register(@RequestBody CreateUserDto createUserDto) {
+    public UserDto register(@RequestBody @Valid CreateUserDto createUserDto) {
         return userService.register(createUserDto);
     }
 
