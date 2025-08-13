@@ -2,16 +2,10 @@ package project.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
@@ -19,7 +13,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,8 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -38,11 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import project.controller.util.ControllerTestUtil;
 import project.dto.rental.RentalDto;
-import project.model.User;
 import project.repository.user.UserRepository;
-import project.service.rental.RentalService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RentalControllerTest {
@@ -55,11 +43,8 @@ class RentalControllerTest {
     private static final String DELETE_FROM_RENTALS = "classpath:databases/delete-from-rental.sql";
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
-    private UserRepository userRepositoryMockBean;
-
-    @SpyBean
-    private RentalService rentalService;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeAll
     static void beforeAll(
@@ -117,58 +102,49 @@ class RentalControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"MANAGER"})
+    @WithMockUser(username = "visitor@user.com", roles = {"MANAGER"})
     @Sql(scripts = {ADD_THREE_USERS, ADD_THREE_CARS, ADD_FIVE_RENTALS},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = {DELETE_FROM_CARS, DELETE_FROM_USERS, DELETE_FROM_RENTALS},
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Get rentals by userId")
     void getRentalById_WithValidId_Ok() throws Exception {
-        User testUser = ControllerTestUtil.createUserForTests();
-
-        when(userRepositoryMockBean.findByEmail(anyString()))
-                .thenReturn(Optional.of(testUser));
+        Long userId = 5L;
 
         RentalDto expected = new RentalDto()
                 .setCarId(3L)
                 .setRentalDate(LocalDate.parse("2025-09-01"))
                 .setReturnDate(LocalDate.parse("2025-09-04"))
-                .setUserId(5L);
+                .setUserId(userId);
 
-        MvcResult result = mockMvc.perform(get("/rentals/{id}", testUser.getId())
+        MvcResult result = mockMvc.perform(get("/rentals/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
+
         RentalDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), RentalDto.class);
+
         assertThat(actual)
                 .usingRecursiveComparison()
                 .ignoringFields("id")
-                .isEqualTo(expected);
+                .isEqualTo(expected);;
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"MANAGER"})
+    @WithMockUser(username = "visitor@user.com", roles = {"MANAGER"})
     @Sql(scripts = {ADD_THREE_USERS, ADD_THREE_CARS, ADD_FIVE_RENTALS},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = {DELETE_FROM_CARS, DELETE_FROM_USERS, DELETE_FROM_RENTALS},
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Get rentals by status")
     void closeRental_Ok() throws Exception {
-        User testUser = ControllerTestUtil.createUserForTests();
         RentalDto expected = new RentalDto()
                 .setCarId(3L)
                 .setRentalDate(LocalDate.parse("2025-09-01"))
                 .setReturnDate(LocalDate.parse("2025-09-04"))
                 .setUserId(5L)
                 .setActualReturnDate(LocalDate.now());
-
-        when(userRepositoryMockBean.findByEmail(anyString()))
-                .thenReturn(Optional.of(testUser));
-
-        doReturn(expected)
-                .when(rentalService)
-                .setActualReturnDate(testUser);
 
         MvcResult result = mockMvc.perform(post("/rentals/return"))
                 .andExpect(status().isOk())
@@ -177,7 +153,9 @@ class RentalControllerTest {
         RentalDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), RentalDto.class);
 
-        assertTrue(reflectionEquals(expected, actual, "id"));
-        verify(rentalService).setActualReturnDate(testUser);
+        assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(expected);
     }
 }

@@ -5,9 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,7 +19,6 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.assertj.core.util.BigDecimalComparator;
@@ -54,14 +51,16 @@ class CarControllerTest {
     protected static MockMvc mockMvc;
     private static final String DELETE_FROM_CARS = "classpath:databases/delete-from-cars.sql";
     private static final String ADD_THREE_CARS = "classpath:databases/add-three-cars.sql";
+    private static final String ADD_THREE_USERS = "classpath:databases/add-three-users.sql";
+    private static final String DELETE_FROM_USERS = "classpath:databases/delete-from-users.sql";
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private CustomUserDetailService customUserDetailService;
     @MockBean
     private TelegramNotificationsService notificationsService;
-    @MockBean
-    private UserRepository userRepositoryMockBean;
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeAll
     static void beforeAll(
@@ -91,27 +90,25 @@ class CarControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"MANAGER"})
-    @Sql(scripts = DELETE_FROM_CARS,
+    @WithMockUser(username = "visitor@user.com", roles = {"MANAGER"})
+    @Sql(scripts = {DELETE_FROM_CARS, ADD_THREE_USERS},
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = DELETE_FROM_CARS,
+    @Sql(scripts = {DELETE_FROM_CARS, DELETE_FROM_USERS},
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Create a new car")
     void createCar_validData_Success() throws Exception {
         CreateCarDto carToRequest = ControllerTestUtil.createOneCarToRequest();
         CarDto expected = ControllerTestUtil.createCarDto();
 
-        User testUser = ControllerTestUtil.createUserForTests();
-        when(userRepositoryMockBean.findByEmail(anyString()))
-                .thenReturn(Optional.of(testUser));
+        User testUser = userRepository.findByEmail("visitor@user.com")
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String jsonRequest = objectMapper.writeValueAsString(carToRequest);
 
         MvcResult result = mockMvc.perform(
                         post("/cars")
                                 .content(jsonRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
