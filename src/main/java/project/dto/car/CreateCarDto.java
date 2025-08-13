@@ -3,6 +3,7 @@ package project.dto.car;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import lombok.Data;
@@ -26,5 +27,6 @@ public class CreateCarDto {
     @Positive
     private int inventory;
     @DecimalMin(value = "0.0", inclusive = false)
+    @NotNull
     private BigDecimal daileFee;
 }
